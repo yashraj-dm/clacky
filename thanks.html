@@ -13,6 +13,10 @@
     p { color: rgba(255,255,255,.6); }
     code { display: inline-block; margin-top: 8px; font: 600 15px/1 ui-monospace, Menlo, monospace; letter-spacing: .06em; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: 12px 16px; user-select: all; }
     .hidden { display: none; }
+    .btn { display: inline-block; margin: 14px 0 6px; background: linear-gradient(180deg, #8B6BFF, #6E4CFF); color: #fff; text-decoration: none; font-weight: 700; padding: 13px 24px; border-radius: 13px; box-shadow: 0 4px 0 #3F22B8, 0 12px 30px rgba(110,76,255,.35); }
+    .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #3F22B8; }
+    .small { font-size: 13px; color: rgba(255,255,255,.45); margin-top: 18px; }
+    .small code { font-size: 12px; padding: 6px 10px; margin-left: 4px; }
   </style>
 </head>
 <body>
@@ -20,27 +24,37 @@
     <img src="icon.png" alt="" />
     <h1 id="title">Thanks for buying Clacky</h1>
     <p id="auto" class="hidden">Clacky is activated. Close this tab and start typing.</p>
-    <div id="manual">
+    <div id="install" class="hidden">
+      <p>One step left: add Clacky to Chrome. <b>Keep this tab open</b> — it activates itself the moment the extension installs.</p>
+      <a class="btn" id="storeBtn" href="#" target="_blank" rel="noopener">Add to Chrome</a>
+      <p class="small">Already installed? Open the extension, click <b>Already bought?</b> and paste: <code id="key2"></code></p>
+    </div>
+    <div id="manual" class="hidden">
       <p>Your licence key — it's also in your email. If Clacky didn't unlock by itself, open the extension, click <b>Already bought?</b> and paste it:</p>
       <code id="key"></code>
     </div>
     <p id="none" class="hidden">Purchase didn't complete. Nothing was charged — try again from the extension.</p>
   </main>
   <script>
+    const STORE_URL = ''   // Chrome Web Store listing — fill in after publishing
+    const $ = (id) => document.getElementById(id)
+    const show = (id) => { for (const x of ['install', 'manual', 'auto', 'none']) $(x).classList.toggle('hidden', x !== id) }
     const q = new URLSearchParams(location.search)
     const key = (q.get('license_key') || '').split(',')[0]
     if (q.get('status') !== 'succeeded' || !key) {
-      document.getElementById('manual').classList.add('hidden')
-      document.getElementById('none').classList.remove('hidden')
-      document.getElementById('title').textContent = 'Hmm, that didn’t go through'
+      show('none'); $('title').textContent = 'Hmm, that didn’t go through'
     } else {
-      document.getElementById('key').textContent = key
+      $('key').textContent = key; $('key2').textContent = key
+      if (STORE_URL) $('storeBtn').href = STORE_URL
+      else $('storeBtn').addEventListener('click', (e) => { e.preventDefault(); e.currentTarget.textContent = 'Coming to the Chrome Web Store' })
+      // Default to "install first"; if the extension is present its content
+      // script replaces this with "all set" (or the manual key on failure).
+      show('install')
     }
     window.addEventListener('message', (e) => {
-      if (e.origin !== location.origin || !e.data || e.data.clacky !== 'activated') return
-      document.getElementById('manual').classList.add('hidden')
-      document.getElementById('auto').classList.remove('hidden')
-      document.getElementById('title').textContent = 'You’re all set'
+      if (e.origin !== location.origin || !e.data || !e.data.clacky) return
+      if (e.data.clacky === 'activated') { show('auto'); $('title').textContent = 'You’re all set' }
+      else if (e.data.clacky === 'failed') show('manual')
     })
   </script>
 </body>
