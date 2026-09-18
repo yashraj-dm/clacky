@@ -23,11 +23,12 @@
   <main>
     <img src="icon.png" alt="" />
     <h1 id="title">Thanks for buying Clacky</h1>
-    <p id="auto" class="hidden">Clacky is activated. Close this tab and start typing.</p>
+    <p id="auto" class="hidden">Clacky is activated. Close this tab and start typing.<br><span class="small">Your licence key is also in your email — check Spam if it isn’t in your inbox.</span></p>
     <div id="install" class="hidden">
       <p>One step left: add Clacky to Chrome. <b>Keep this tab open</b> — it activates itself the moment the extension installs.</p>
       <a class="btn" id="storeBtn" href="#" target="_blank" rel="noopener">Add to Chrome</a>
       <p class="small">Already installed? Open the extension, click <b>Already bought?</b> and paste: <code id="key2"></code></p>
+      <p class="small">Your licence key is also in your email — check Spam if it isn’t in your inbox.</p>
     </div>
     <div id="manual" class="hidden">
       <p>Your licence key — it's also in your email. If Clacky didn't unlock by itself, open the extension, click <b>Already bought?</b> and paste it:</p>
@@ -36,7 +37,7 @@
     <p id="none" class="hidden">Purchase didn't complete. Nothing was charged — try again from the extension.</p>
   </main>
   <script>
-    const STORE_URL = ''   // Chrome Web Store listing — fill in after publishing
+    const STORE_URL = 'https://chromewebstore.google.com/detail/bkfcilaccahjobheeimoakleihfalfpi'
     const $ = (id) => document.getElementById(id)
     const show = (id) => { for (const x of ['install', 'manual', 'auto', 'none']) $(x).classList.toggle('hidden', x !== id) }
     const q = new URLSearchParams(location.search)
